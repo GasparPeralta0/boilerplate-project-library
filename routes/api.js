@@ -14,9 +14,7 @@ if (process.env.NODE_ENV === 'test') {
   const id = makeId();
   books.set(id, { _id: id, title: 'Seed Book', comments: [] });
 }
-
-app.get('//api/books', (req, res) => res.redirect(301, '/api/books'));
-
+ 
 module.exports = function (app) {
   // GET /api/books
   app.get('/api/books', function (req, res) {

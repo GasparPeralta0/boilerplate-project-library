@@ -35,6 +35,12 @@ app.route('/').get(function (req, res) {
 // FCC testing routes
 fccTestingRoutes(app);
 
+// ✅ normalize multiple slashes: //api/books -> /api/books
+app.use((req, res, next) => {
+  if (req.url.includes('//')) req.url = req.url.replace(/\/{2,}/g, '/');
+  next();
+});
+
 // API routes
 apiRoutes(app);
 
