@@ -20,6 +20,13 @@ app.use(cors({ origin: '*' })); // FCC testing only
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.enable('trust proxy');
+app.use((req, res, next) => {
+  const proto = req.headers['x-forwarded-proto'];
+  if (proto && proto !== 'https') return res.redirect(301, 'https://' + req.headers.host + req.originalUrl);
+  next();
+});
+
 // Index page
 app.route('/').get(function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
