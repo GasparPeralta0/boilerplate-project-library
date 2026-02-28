@@ -12,6 +12,7 @@ const runner = require('./test-runner');
 const app = express();
 
 app.use('/public', express.static(process.cwd() + '/public'));
+app.options('*', cors());
 app.use(cors({ origin: '*' }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
