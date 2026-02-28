@@ -63,35 +63,19 @@ mongoose
   .then(async () => {
     console.log('✅ MongoDB connected');
 
-    if (process.env.NODE_ENV === 'test') {
-      console.log('Running Tests...');
-
-      // ✅ Seed book for example test if empty
-      const Book = mongoose.models.Book;
-      if (Book) {
-        const count = await Book.countDocuments({});
-        if (count === 0) {
-          await Book.create({ title: 'Seed Book', comments: [] });
-        }
+    const Book = mongoose.models.Book;
+    if (Book) {
+      const count = await Book.countDocuments({});
+      if (count === 0) {
+        await Book.create({ title: 'Initial Book', comments: [] });
+        console.log('📚 Seed book created');
       }
-
-      setTimeout(function () {
-        try {
-          runner.run();
-        } catch (e) {
-          console.log('Tests are not valid:');
-          console.error(e);
-        }
-      }, 1500);
-
-      // ✅ IMPORTANT: do NOT app.listen() in test mode
-      return;
     }
 
-    // Normal mode: start server
     const listener = app.listen(process.env.PORT || 3000, function () {
       console.log('Your app is listening on port ' + listener.address().port);
     });
+
   })
   .catch((err) => {
     console.log('MongoDB connection error:', err);
