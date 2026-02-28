@@ -21,105 +21,104 @@ async function ensureConnected() {
 
 module.exports = function (app) {
 
-  // GET /api/books
+  // GET /api/books => array of books with commentcount
   app.get('/api/books', async (req, res) => {
     try {
       await ensureConnected();
       const books = await Book.find({}).lean();
-      return res.json(books.map(b => ({
-        _id: b._id.toString(),
-        title: b.title,
-        commentcount: (b.comments || []).length
-      })));
+
+      return res.json(
+        books.map(b => ({
+          _id: b._id.toString(),
+          title: b.title,
+          commentcount: (b.comments || []).length
+        }))
+      );
     } catch (err) {
-      return res.status(500).type('json').send({ error: 'db error' });
+      return res.status(500).type('text').send('server error');
     }
   });
 
-  // POST /api/books
+  // POST /api/books => create new book
   app.post('/api/books', async (req, res) => {
     try {
       await ensureConnected();
       const title = req.body.title;
+
       if (!title) return res.type('text').send('missing required field title');
 
       const book = await Book.create({ title, comments: [] });
       return res.json({ _id: book._id.toString(), title: book.title });
     } catch (err) {
-      return res.status(500).type('json').send({ error: 'db error' });
+      return res.status(500).type('text').send('server error');
     }
   });
 
-  // GET /api/books/:id
+  // GET /api/books/:id => single book with comments array
   app.get('/api/books/:id', async (req, res) => {
     try {
       await ensureConnected();
       const book = await Book.findById(req.params.id).lean();
+
       if (!book) return res.type('text').send('no book exists');
-                 // Si la DB está vacía, devolvemos 1 libro dummy para evitar bug del evaluador FCC
-      if (books.length === 0) {
-          return res.json([
-             { _id: '000000000000000000000000', title: 'placeholder', commentcount: 0 }
-  ]);
-} 
+
       return res.json({
         _id: book._id.toString(),
         title: book.title,
         comments: book.comments || []
       });
     } catch (err) {
+      // invalid ObjectId or db error -> FCC expects "no book exists"
       return res.type('text').send('no book exists');
     }
   });
 
-  // POST /api/books/:id (add comment)
+  // POST /api/books/:id => add comment, return updated book
   app.post('/api/books/:id', async (req, res) => {
     try {
       await ensureConnected();
       const comment = req.body.comment;
+
       if (!comment) return res.type('text').send('missing required field comment');
 
       const book = await Book.findById(req.params.id);
       if (!book) return res.type('text').send('no book exists');
 
-      const books = await Book.find({}).lean();
+      book.comments.push(comment);
+      await book.save();
 
-if (books.length === 0) {
-  return res.json([
-    { _id: '000000000000000000000000', title: 'placeholder', commentcount: 0 }
-  ]);
-}
-
-return res.json(books.map(b => ({
-  _id: b._id.toString(),
-  title: b.title,
-  commentcount: (b.comments || []).length
-})));
+      return res.json({
+        _id: book._id.toString(),
+        title: book.title,
+        comments: book.comments
+      });
     } catch (err) {
       return res.type('text').send('no book exists');
     }
   });
 
-  // DELETE /api/books/:id
+  // DELETE /api/books/:id => delete one
   app.delete('/api/books/:id', async (req, res) => {
     try {
       await ensureConnected();
       const deleted = await Book.findByIdAndDelete(req.params.id);
+
       if (!deleted) return res.type('text').send('no book exists');
+
       return res.type('text').send('delete successful');
     } catch (err) {
       return res.type('text').send('no book exists');
     }
   });
 
-  // DELETE /api/books (delete all)
+  // DELETE /api/books => delete all
   app.delete('/api/books', async (req, res) => {
     try {
       await ensureConnected();
       await Book.deleteMany({});
       return res.type('text').send('complete delete successful');
     } catch (err) {
-      return res.status(500).type('json').send({ error: 'db error' });
+      return res.status(500).type('text').send('server error');
     }
   });
 
