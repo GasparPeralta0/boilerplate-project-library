@@ -20,7 +20,7 @@ module.exports = function (app) {
       const book = await Book.create({ title, comments: [] });
       return res.json({ _id: book._id.toString(), title: book.title });
     } catch (e) {
-      return res.status(500).type('text').send('server error');
+      return res.type('text').status(500).send('server error');
     }
   });
 
@@ -34,7 +34,7 @@ module.exports = function (app) {
         commentcount: (b.comments || []).length
       })));
     } catch (e) {
-      return res.status(500).type('text').send('server error');
+      return res.type('text').status(500).send('server error');
     }
   });
 
@@ -50,7 +50,7 @@ module.exports = function (app) {
         comments: book.comments || []
       });
     } catch (e) {
-      return res.type('text').send('no book exists');
+      return res.type('text').status(500).send('server error');
     }
   });
 
@@ -72,7 +72,7 @@ module.exports = function (app) {
         comments: book.comments
       });
     } catch (e) {
-      return res.type('text').send('no book exists');
+      return res.type('text').status(500).send('server error');
     }
   });
 
@@ -83,7 +83,7 @@ module.exports = function (app) {
       if (!deleted) return res.type('text').send('no book exists');
       return res.type('text').send('delete successful');
     } catch (e) {
-      return res.type('text').send('no book exists');
+      return res.type('text').status(500).send('server error');
     }
   });
 
@@ -93,7 +93,7 @@ module.exports = function (app) {
       await Book.deleteMany({});
       return res.type('text').send('complete delete successful');
     } catch (e) {
-      return res.status(500).type('text').send('server error');
+      return res.type('text').status(500).send('server error');
     }
   });
 

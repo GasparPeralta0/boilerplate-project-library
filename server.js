@@ -15,7 +15,7 @@ const runner = require('./test-runner');
 const app = express();
 
 app.use('/public', express.static(process.cwd() + '/public'));
-app.use(cors({ origin: '*' }));
+app.use(cors({ origin: '*', methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', allowedHeaders: ['Content-Type'] }));
 app.options('*', cors()); // preflight
 
 app.use(bodyParser.json());
