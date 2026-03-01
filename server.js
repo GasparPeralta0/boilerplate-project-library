@@ -21,11 +21,10 @@ app.use((req, res, next) => {
     return res.redirect(301, 'https://' + req.headers.host + req.originalUrl);
   }
   next();
-});
-
+ });
 app.use('/public', express.static(process.cwd() + '/public'));
-app.use(cors({ origin: '*', methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', allowedHeaders: ['Content-Type'] }));
-app.options('*', cors()); // preflight
+app.use(cors());
+app.options('*', cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,6 +32,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.route('/').get(function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
+
+app.options('/api/books', cors());
+app.options('/api/books/:id', cors()); 
 
 fccTestingRoutes(app);
 apiRoutes(app);
